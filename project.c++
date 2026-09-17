@@ -5,3 +5,5 @@
 #include <vector>
 using namespace std;
 
+#include "Resource.h"
+#include "Reservation.h"
