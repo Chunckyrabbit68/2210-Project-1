@@ -57,7 +57,7 @@ void displayCancellationHistory() {
   if (cancellationHistory.empty()){
     cout << "No cancelled history.\n";
     return;
-  }
+  }    // test to see if it pushes to the main
 
   stack<Reservation> temp = cancellationHistory;
   cout << "----- Cancellation History -----\n";
