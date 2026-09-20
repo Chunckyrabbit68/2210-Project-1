@@ -10,6 +10,7 @@
 using namespace std;
 
 vector<Resource> resources;
+vector<Reservation> reservations;
 
 // Load resources from resources.txt
 void loadResources(const string& filename) {
@@ -76,11 +77,87 @@ Resource* findResource(const string& resourceID) {
     return nullptr;
 }
 
-int main() {
-    loadResources("resources.txt");
+// Check whether a reservation can be made
+bool validateReservation(const string& resourceID) {
+    Resource* resource = findResource(resourceID);
 
-    displayResources();
-    displayAvailability();
+    if (resource == nullptr) {
+        cout << "Invalid resource ID." << endl;
+        return false;
+    }
 
-    return 0;
+    if (!resource->isAvailable()) {
+        cout << "Resource is unavailable." << endl;
+        return false;
+    }
+
+    return true;
+}
+
+// Create reservation
+void createReservation() {
+    int reservationID;
+    int studentID;
+
+    string studentName;
+    string resourceID;
+    string date;
+    string time;
+
+    cout << "Enter reservation ID: ";
+    cin >> reservationID;
+
+    cout << "Enter student ID: ";
+    cin >> studentID;
+
+    cin.ignore();
+
+    cout << "Enter student name: ";
+    getline(cin, studentName);
+
+    cout << "Enter resource ID: ";
+    cin >> resourceID;
+
+    cout << "Enter reservation date: ";
+    cin >> date;
+
+    cout << "Enter reservation time: ";
+    cin >> time;
+
+    if (!validateReservation(resourceID)) {
+        return;
+    }
+
+    Reservation newReservation(
+        reservationID,
+        studentID,
+        studentName,
+        resourceID,
+        date,
+        time
+    );
+
+    reservations.push_back(newReservation);
+
+    Resource* resource = findResource(resourceID);
+    resource->setStatus("Unavailable");
+
+    cout << "\nReservation created:" << endl;
+    newReservation.display();
+
+    cout << "Reservation created successfully." << endl;
+}
+
+// Display active reservations
+void displayReservations() {
+    cout << "\n--- Active Reservations ---" << endl;
+
+    if (reservations.empty()) {
+        cout << "No active reservations." << endl;
+        return;
+    }
+
+    for (const Reservation& reservation : reservations) {
+        reservation.display();
+    }
 }
