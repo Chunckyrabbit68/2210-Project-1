@@ -1,4 +1,9 @@
+#include <iostream>
 #include <queue>
+#include "Resource.h"
+#include "Reservation.h"
+
+using namespace std;
 
 struct ReservationNode {
 Reservation data;
