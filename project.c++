@@ -10,7 +10,11 @@
 using namespace std;
 
 vector<Resource> resources;
-vector<Reservation> reservations;
+
+// These functions are in ComplexityTest.cpp
+void insertReservation(Reservation reservation);
+void displayReservations();
+void addToWaitingList(Reservation reservation);
 
 // Load resources from resources.txt
 void loadResources(const string& filename) {
@@ -124,7 +128,10 @@ void createReservation() {
     cout << "Enter reservation time: ";
     cin >> time;
 
-    if (!validateReservation(resourceID)) {
+    Resource* resource = findResource(resourceID);
+
+    if (resource == nullptr) {
+        cout << "Invalid resource ID." << endl;
         return;
     }
 
@@ -137,27 +144,18 @@ void createReservation() {
         time
     );
 
-    reservations.push_back(newReservation);
+    if (!resource->isAvailable()) {
+        cout << "Resource is unavailable." << endl;
+        addToWaitingList(newReservation);
+        return;
+    }
 
-    Resource* resource = findResource(resourceID);
+    insertReservation(newReservation);
+
     resource->setStatus("Unavailable");
 
     cout << "\nReservation created:" << endl;
     newReservation.display();
 
     cout << "Reservation created successfully." << endl;
-}
-
-// Display active reservations
-void displayReservations() {
-    cout << "\n--- Active Reservations ---" << endl;
-
-    if (reservations.empty()) {
-        cout << "No active reservations." << endl;
-        return;
-    }
-
-    for (const Reservation& reservation : reservations) {
-        reservation.display();
-    }
 }
