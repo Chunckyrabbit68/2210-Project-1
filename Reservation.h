@@ -5,23 +5,22 @@
 using namespace std;
 
 class Reservation {
-private:
+public:
     int reservationID;
     int studentID;
     string studentName;
-    string resourceID;
+    string resource;
     string date;
+    string time;
 
-public:
     Reservation();
 
-    Reservation(int reservationID, int studentID, string studentName, string resourceID, string date);
-
-    int getReservationID() const;
-    int getStudentID() const;
-    string getStudentName() const;
-    string getResourceID() const;
-    string getDate() const;
+    Reservation(int reservationID,
+                int studentID,
+                string studentName,
+                string resource,
+                string date,
+                string time = "");
 
     void display() const;
 };
