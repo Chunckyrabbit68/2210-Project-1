@@ -1,66 +1,163 @@
-int main() {
-    loadResources("resources.txt");
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <vector>
+#include <string>
 
-    int choice;
+#include "Resource.h"
+#include "Reservation.h"
 
-    do {
-        cout << "\nCampus Resource Reservation System" << endl;
-        cout << "1. Display all resources" << endl;
-        cout << "2. Display resource availability" << endl;
-        cout << "3. Create reservation" << endl;
-        cout << "4. Display active reservations" << endl;
-        cout << "5. Cancel reservation" << endl;
-        cout << "6. Restore cancelled reservation" << endl;
-        cout << "7. Display cancellation history" << endl;
-        cout << "8. Exit" << endl;
+using namespace std;
 
-        cout << "Enter choice: ";
-        cin >> choice;
+vector<Resource> resources;
+vector<Reservation> reservations;
 
-        switch (choice) {
-            case 1:
-                displayResources();
-                break;
+// Load resources from resources.txt
+void loadResources(const string& filename) {
+    ifstream file(filename);
 
-            case 2:
-                displayAvailability();
-                break;
+    if (!file.is_open()) {
+        cout << "Error opening resource file." << endl;
+        return;
+    }
 
-            case 3:
-                createReservation();
-                break;
+    string line;
 
-            case 4:
-                displayReservations();
-                break;
+    while (getline(file, line)) {
+        stringstream ss(line);
 
-            case 5: {
-                int reservationID;
+        string id;
+        string name;
+        string type;
+        string status;
 
-                cout << "Enter reservation ID to cancel: ";
-                cin >> reservationID;
+        getline(ss, id, '|');
+        getline(ss, name, '|');
+        getline(ss, type, '|');
+        getline(ss, status);
 
-                cancelReservation(reservationID);
-                break;
-            }
+        Resource resource(id, name, type, status);
+        resources.push_back(resource);
+    }
 
-            case 6:
-                restoreCancellation();
-                break;
+    file.close();
+}
 
-            case 7:
-                displayCancellationHistory();
-                break;
+// Display every resource
+void displayResources() {
+    cout << "\n--- All Resources ---" << endl;
 
-            case 8:
-                cout << "Exiting program." << endl;
-                break;
+    for (const Resource& resource : resources) {
+        resource.display();
+    }
+}
 
-            default:
-                cout << "Invalid choice. Try again." << endl;
+// Display availability
+void displayAvailability() {
+    cout << "\n--- Resource Availability ---" << endl;
+
+    for (const Resource& resource : resources) {
+        cout << resource.getResourceID()
+             << " - "
+             << resource.getResourceName()
+             << ": "
+             << resource.getStatus()
+             << endl;
+    }
+}
+
+// Find resource by ID
+Resource* findResource(const string& resourceID) {
+    for (Resource& resource : resources) {
+        if (resource.getResourceID() == resourceID) {
+            return &resource;
         }
+    }
 
-    } while (choice != 8);
+    return nullptr;
+}
 
-    return 0;
+// Check whether a reservation can be made
+bool validateReservation(const string& resourceID) {
+    Resource* resource = findResource(resourceID);
+
+    if (resource == nullptr) {
+        cout << "Invalid resource ID." << endl;
+        return false;
+    }
+
+    if (!resource->isAvailable()) {
+        cout << "Resource is unavailable." << endl;
+        return false;
+    }
+
+    return true;
+}
+
+// Create reservation
+void createReservation() {
+    int reservationID;
+    int studentID;
+
+    string studentName;
+    string resourceID;
+    string date;
+    string time;
+
+    cout << "Enter reservation ID: ";
+    cin >> reservationID;
+
+    cout << "Enter student ID: ";
+    cin >> studentID;
+
+    cin.ignore();
+
+    cout << "Enter student name: ";
+    getline(cin, studentName);
+
+    cout << "Enter resource ID: ";
+    cin >> resourceID;
+
+    cout << "Enter reservation date: ";
+    cin >> date;
+
+    cout << "Enter reservation time: ";
+    cin >> time;
+
+    if (!validateReservation(resourceID)) {
+        return;
+    }
+
+    Reservation newReservation(
+        reservationID,
+        studentID,
+        studentName,
+        resourceID,
+        date,
+        time
+    );
+
+    reservations.push_back(newReservation);
+
+    Resource* resource = findResource(resourceID);
+    resource->setStatus("Unavailable");
+
+    cout << "\nReservation created:" << endl;
+    newReservation.display();
+
+    cout << "Reservation created successfully." << endl;
+}
+
+// Display active reservations
+void displayReservations() {
+    cout << "\n--- Active Reservations ---" << endl;
+
+    if (reservations.empty()) {
+        cout << "No active reservations." << endl;
+        return;
+    }
+
+    for (const Reservation& reservation : reservations) {
+        reservation.display();
+    }
 }
