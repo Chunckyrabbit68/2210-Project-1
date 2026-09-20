@@ -7,20 +7,24 @@
 #include "Reservation.h"
 using namespace std;
 
+stack<Reservation> cancellationHistory;
+
 // Note: To cancel reservations you'll need the reservation ID
 void cancelReservation(int reservationID) {
-  for(auto currReservation = reservations.begin(); currReservation != reservations.end(); ++currReservation){
-    if(currReservation->reservationID == reservationID){
-      cancellationHistory.push(*currReservation); //stores the cancelled reservation
-      reservations.erase(currReservation);        // removes the reservation from active reservations 
+  Reservation removedReservation;
 
-      cout << "Reservation " << reservationID << " has been cancelled successfully.\n";
+  if(removeReservation(reservationID, removedReservation)){
+    cancellationHistory.push(removedReservation); //stores the cancelled reservation
+    Resource* resource = findResource(removedReservation.resource);
+    if(resource != nullptr){
+      
+        resource->setStatus("Available");
+      }
+       cout << "Reservation " << reservationID << " has been cancelled successfully.\n";
       
       return;
-    }
   }
-
-  cout << "Reservation not found.\n";             // if reservation isnt found in active reservations
+  cout << "Reservation not found.\n"; // if reservation isnt found in active reservations
 }
 
 void restoreCancellation() {
@@ -29,10 +33,15 @@ void restoreCancellation() {
     return;
   }
   Reservation restored = cancellationHistory.top();    // gets the most recent cancelled reservation
-  cancellationHistory.pop();                      // removes it from cancellation history
-  reservations.push_back(restored);                // adds it back to active reservations
-  
-  cout << "Reservation " << reservationID << " restored successfully.\n";
+    cancellationHistory.pop();   // removes it from cancellation history
+    insertReservation(restored);  // adds it back to active reservations
+
+  Resource* resource = findResource(restored.resource);
+
+  if(resource != nullptr){
+    resource->setStatus("Unavailable");
+  }
+  cout << "Reservation " << restored.reservationID << " restored successfully.\n";
 }
 
 void displayCancellationHistory() {
@@ -55,4 +64,3 @@ void displayCancellationHistory() {
     temp.pop();
   }
 }
-
