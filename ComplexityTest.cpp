@@ -83,7 +83,8 @@ waitingList.push(reservation);
 cout << "Reservation added to waiting list.\n";
 }
 
-
+// Process waiting list
+// Queue operation O(1), resource search O(n)
 void processWaitingList(){
   if(waitingList.empty()){
   cout << "Waiting list is empty.\n";
