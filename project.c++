@@ -84,24 +84,35 @@ cout << "Reservation added to waiting list.\n";
 }
 
 
-// Remove first reservation from waiting list
-// O(1)
 void processWaitingList(){
   if(waitingList.empty()){
   cout << "Waiting list is empty.\n";
   return;
   }
 
-  Reservation nextReservation = waitingList.front();
+Reservation nextReservation = waitingList.front();
+Resource* resource = findResource(nextReservation.resource);
+
+  if(resource == nullptr){
+  cout << "Resource not found.\n";
+  return;
+  }
+
+  if(!resource->isAvailable()){
+  cout << "Resource is still unavailable.\n";
+  return;
+  }
+
   waitingList.pop();
 
   insertReservation(nextReservation);
+
+  resource->setStatus("Unavailable");
 
   cout << "Reservation "
   << nextReservation.reservationID
   << " added to active reservations.\n";
 }
-
 
 // Display waiting list
 // O(n)
