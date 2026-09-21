@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <limits>
 
 using namespace std;
 
@@ -21,80 +22,94 @@ void displayCancellationHistory();
 
 int main() {
 
-  loadResources("resources.txt");
+    loadResources("resources.txt");
 
-  int choice;
+    int choice;
 
-  do {
+    do {
 
-    cout << "\nCampus Resource Reservation System" << endl;
-    cout << "1. Display all resources" << endl;
-    cout << "2. Display resource availability" << endl;
-    cout << "3. Create reservation" << endl;
-    cout << "4. Display active reservations" << endl;
-    cout << "5. Display waiting list" << endl;
-    cout << "6. Process waiting list" << endl;
-    cout << "7. Cancel reservation" << endl;
-    cout << "8. Restore cancelled reservation" << endl;
-    cout << "9. Display cancellation history" << endl;
-    cout << "10. Exit" << endl;
+        cout << "\nCampus Resource Reservation System" << endl;
+        cout << "1. Display all resources" << endl;
+        cout << "2. Display resource availability" << endl;
+        cout << "3. Create reservation" << endl;
+        cout << "4. Display active reservations" << endl;
+        cout << "5. Display waiting list" << endl;
+        cout << "6. Process waiting list" << endl;
+        cout << "7. Cancel reservation" << endl;
+        cout << "8. Restore cancelled reservation" << endl;
+        cout << "9. Display cancellation history" << endl;
+        cout << "10. Exit" << endl;
 
-    cout << "Enter choice: ";
-    cin >> choice;
+        cout << "Enter choice: ";
 
-    switch(choice){
+        if (!(cin >> choice)) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
-      case 1:
-        displayResources();
-        break;
+            cout << "Invalid input. Please enter a number from 1 to 10." << endl;
+            continue;
+        }
 
-      case 2:
-        displayAvailability();
-        break;
+        switch(choice) {
 
-      case 3:
-        createReservation();
-        break;
+            case 1:
+                displayResources();
+                break;
 
-      case 4:
-        displayReservations();
-        break;
+            case 2:
+                displayAvailability();
+                break;
 
-      case 5:
-        displayWaitingList();
-        break;
+            case 3:
+                createReservation();
+                break;
 
-      case 6:
-        processWaitingList();
-        break;
+            case 4:
+                displayReservations();
+                break;
 
-      case 7: {
-        int reservationID;
+            case 5:
+                displayWaitingList();
+                break;
 
-        cout << "Enter reservation ID to cancel: ";
-        cin >> reservationID;
+            case 6:
+                processWaitingList();
+                break;
 
-        cancelReservation(reservationID);
-        break;
-      }
+            case 7: {
+                int reservationID;
 
-      case 8:
-        restoreCancellation();
-        break;
+                cout << "Enter reservation ID to cancel: ";
 
-      case 9:
-        displayCancellationHistory();
-        break;
+                if (!(cin >> reservationID)) {
+                    cin.clear();
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
-      case 10:
-        cout << "Exiting program." << endl;
-        break;
+                    cout << "Invalid reservation ID." << endl;
+                    break;
+                }
 
-      default:
-        cout << "Invalid choice. Try again." << endl;
-    }
+                cancelReservation(reservationID);
+                break;
+            }
 
-  } while(choice != 10);
+            case 8:
+                restoreCancellation();
+                break;
 
-  return 0;
+            case 9:
+                displayCancellationHistory();
+                break;
+
+            case 10:
+                cout << "Exiting program." << endl;
+                break;
+
+            default:
+                cout << "Invalid choice. Try again." << endl;
+        }
+
+    } while(choice != 10);
+
+    return 0;
 }
