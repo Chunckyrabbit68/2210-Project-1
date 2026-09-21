@@ -96,7 +96,9 @@ Menu
 
 9 Display cancellation history
 
-10 Exit
+10 waiting list removal
+
+11 Exit
 
 Testing
 
