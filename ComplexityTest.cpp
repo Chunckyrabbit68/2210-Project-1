@@ -23,59 +23,13 @@ ReservationNode* head = nullptr;
 queue<Reservation> waitingList;
 
 
-// Check for duplicate reservation ID
-// O(n)
-bool reservationExists(int reservationID){
-  ReservationNode* current = head;
-
-  while(current != nullptr){
-
-    if(current->data.reservationID == reservationID){
-      return true;
-    }
-
-    current = current->next;
-  }
-
-  return false;
-}
-
-
-// Check resource for date and time conflict
-// O(n)
-bool isResourceReserved(const string& resourceID, const string& date, const string& time){
-  ReservationNode* current = head;
-
-  while(current != nullptr){
-
-    if(current->data.resource == resourceID &&
-       current->data.date == date &&
-       current->data.time == time){
-      return true;
-    }
-
-    current = current->next;
-  }
-
-  return false;
-}
-
-
 // Reservation insertion
-// O(n)
-bool insertReservation(Reservation reservation){
-
-  if(reservationExists(reservation.reservationID)){
-    cout << "Reservation ID " << reservation.reservationID << " is already in use.\n";
-    return false;
-  }
-
+// O(1)
+void insertReservation(Reservation reservation){
   ReservationNode* newNode = new ReservationNode(reservation);
 
   newNode->next = head;
   head = newNode;
-
-  return true;
 }
 
 
@@ -139,7 +93,7 @@ void addToWaitingList(Reservation reservation){
 
 
 // Process waiting list
-// Queue operation O(1), resource and conflict search O(n)
+// Queue operation O(1), resource search O(n)
 void processWaitingList(){
   if(waitingList.empty()){
     cout << "Waiting list is empty.\n";
@@ -155,8 +109,7 @@ void processWaitingList(){
     return;
   }
 
-  if(!resource->isAvailable() ||
-     isResourceReserved(nextReservation.resource, nextReservation.date, nextReservation.time)){
+  if(!resource->isAvailable()){
     cout << "Resource is still unavailable.\n";
     return;
   }
@@ -165,36 +118,11 @@ void processWaitingList(){
 
   insertReservation(nextReservation);
 
+  resource->setStatus("Unavailable");
+
   cout << "Reservation "
        << nextReservation.reservationID
        << " added to active reservations.\n";
-}
-
-
-// Remove reservation from waiting list
-// O(n)
-bool removeFromWaitingList(int reservationID){
-  int waiting = waitingList.size();
-  bool removed = false;
-
-  queue<Reservation> remaining;
-
-  for(int i = 0; i < waiting; i++){
-
-    Reservation current = waitingList.front();
-    waitingList.pop();
-
-    if(!removed && current.reservationID == reservationID){
-      removed = true;
-      continue;
-    }
-
-    remaining.push(current);
-  }
-
-  waitingList = remaining;
-
-  return removed;
 }
 
 
