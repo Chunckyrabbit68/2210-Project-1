@@ -5,6 +5,7 @@
 #include <string>
 #include <stack>
 #include <queue>
+#include <limits>
 
 #include "Resource.h"
 #include "Reservation.h"
@@ -115,12 +116,26 @@ void createReservation() {
     string time;
 
     cout << "Enter reservation ID: ";
-    cin >> reservationID;
+
+    if (!(cin >> reservationID)) {
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+        cout << "Invalid reservation ID." << endl;
+        return;
+    }
 
     cout << "Enter student ID: ";
-    cin >> studentID;
 
-    cin.ignore();
+    if (!(cin >> studentID)) {
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+        cout << "Invalid student ID." << endl;
+        return;
+    }
+
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
     cout << "Enter student name: ";
     getline(cin, studentName);
@@ -152,7 +167,9 @@ void createReservation() {
 
     if (!resource->isAvailable()) {
         cout << "Resource is unavailable." << endl;
+
         addToWaitingList(newReservation);
+
         return;
     }
 
@@ -161,6 +178,7 @@ void createReservation() {
     resource->setStatus("Unavailable");
 
     cout << "\nReservation created:" << endl;
+
     newReservation.display();
 
     cout << "Reservation created successfully." << endl;
@@ -171,6 +189,7 @@ void cancelReservation(int reservationID) {
     Reservation removedReservation;
 
     if (removeReservation(reservationID, removedReservation)) {
+
         cancellationHistory.push(removedReservation);
 
         Resource* resource = findResource(removedReservation.resource);
