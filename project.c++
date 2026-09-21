@@ -16,9 +16,8 @@ vector<Resource> resources;
 stack<Reservation> cancellationHistory;
 
 // These functions are in ComplexityTest.cpp
-bool insertReservation(Reservation reservation);
+void insertReservation(Reservation reservation);
 bool removeReservation(int reservationID, Reservation& removedReservation);
-bool isResourceReserved(const string& resourceID, const string& date, const string& time);
 void displayReservations();
 void addToWaitingList(Reservation reservation);
 void displayWaitingList();
@@ -174,18 +173,9 @@ void createReservation() {
         return;
     }
 
-    if (isResourceReserved(resourceID, date, time)) {
-        cout << "Resource is already reserved for "
-             << date << " at " << time << "." << endl;
+    insertReservation(newReservation);
 
-        addToWaitingList(newReservation);
-
-        return;
-    }
-
-    if (!insertReservation(newReservation)) {
-        return;
-    }
+    resource->setStatus("Unavailable");
 
     cout << "\nReservation created:" << endl;
 
@@ -201,6 +191,12 @@ void cancelReservation(int reservationID) {
     if (removeReservation(reservationID, removedReservation)) {
 
         cancellationHistory.push(removedReservation);
+
+        Resource* resource = findResource(removedReservation.resource);
+
+        if (resource != nullptr) {
+            resource->setStatus("Available");
+        }
 
         cout << "Reservation "
              << reservationID
@@ -234,16 +230,11 @@ void restoreCancellation() {
         return;
     }
 
-    if (isResourceReserved(restored.resource, restored.date, restored.time)) {
-        cout << "That time slot has been taken by another reservation." << endl;
-        return;
-    }
-
     cancellationHistory.pop();
 
-    if (!insertReservation(restored)) {
-        return;
-    }
+    insertReservation(restored);
+
+    resource->setStatus("Unavailable");
 
     cout << "Reservation "
          << restored.reservationID
