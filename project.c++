@@ -3,6 +3,8 @@
 #include <sstream>
 #include <vector>
 #include <string>
+#include <stack>
+#include <queue>
 
 #include "Resource.h"
 #include "Reservation.h"
