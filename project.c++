@@ -18,6 +18,7 @@ stack<Reservation> cancellationHistory;
 // These functions are in ComplexityTest.cpp
 void insertReservation(Reservation reservation);
 bool removeReservation(int reservationID, Reservation& removedReservation);
+bool reservationExists(int reservationID);
 void displayReservations();
 void addToWaitingList(Reservation reservation);
 void displayWaitingList();
@@ -88,7 +89,7 @@ Resource* findResource(const string& resourceID) {
     return nullptr;
 }
 
-// Validate reservation resource
+// Check whether a reservation can be made
 bool validateReservation(const string& resourceID) {
     Resource* resource = findResource(resourceID);
 
@@ -122,6 +123,15 @@ void createReservation() {
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
         cout << "Invalid reservation ID." << endl;
+        return;
+    }
+
+    if (reservationExists(reservationID)) {
+        cout << "Reservation ID "
+             << reservationID
+             << " is already in use."
+             << endl;
+
         return;
     }
 
