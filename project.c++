@@ -20,6 +20,7 @@ stack<Reservation> cancellationHistory;
 void insertReservation(Reservation reservation);
 void displayReservations();
 void addToWaitingList(Reservation reservation);
+bool removeReservation(int reservationID, Reservation& removedReservation);
 
 // Load resources from resources.txt
 void loadResources(const string& filename) {
@@ -213,7 +214,7 @@ void displayCancellationHistory() {
   if (cancellationHistory.empty()){
     cout << "No cancelled history.\n";
     return;
-  }    // test to see if it pushes to the main
+  }    
 
   stack<Reservation> temp = cancellationHistory;
   cout << "----- Cancellation History -----\n";
