@@ -1,6 +1,7 @@
 #include <iostream>
 #include <queue>
 #include <string>
+
 #include "Resource.h"
 #include "Reservation.h"
 
@@ -9,13 +10,13 @@ using namespace std;
 Resource* findResource(const string& resourceID);
 
 struct ReservationNode {
-  Reservation data;
-  ReservationNode* next;
+    Reservation data;
+    ReservationNode* next;
 
-  ReservationNode(Reservation reservation){
-    data = reservation;
-    next = nullptr;
-  }
+    ReservationNode(Reservation reservation) {
+        data = reservation;
+        next = nullptr;
+    }
 };
 
 ReservationNode* head = nullptr;
@@ -23,148 +24,133 @@ ReservationNode* head = nullptr;
 queue<Reservation> waitingList;
 
 
-// Check if reservation ID already exists
-// O(n)
-bool reservationExists(int reservationID){
-  ReservationNode* current = head;
-
-  while(current != nullptr){
-
-    if(current->data.reservationID == reservationID){
-      return true;
-    }
-
-    current = current->next;
-  }
-
-  return false;
-}
-
-
 // Reservation insertion
 // O(1)
-void insertReservation(Reservation reservation){
-  ReservationNode* newNode = new ReservationNode(reservation);
+void insertReservation(Reservation reservation) {
+    ReservationNode* newNode = new ReservationNode(reservation);
 
-  newNode->next = head;
-  head = newNode;
+    newNode->next = head;
+    head = newNode;
 }
 
 
 // Reservation removal
 // O(n)
-bool removeReservation(int reservationID, Reservation& removedReservation){
-  ReservationNode* current = head;
-  ReservationNode* previous = nullptr;
+bool removeReservation(
+    int reservationID,
+    Reservation& removedReservation
+) {
+    ReservationNode* current = head;
+    ReservationNode* previous = nullptr;
 
-  while(current != nullptr){
+    while (current != nullptr) {
 
-    if(current->data.reservationID == reservationID){
+        if (current->data.reservationID == reservationID) {
 
-      removedReservation = current->data;
+            removedReservation = current->data;
 
-      if(previous == nullptr){
-        head = current->next;
-      }
-      else{
-        previous->next = current->next;
-      }
+            if (previous == nullptr) {
+                head = current->next;
+            }
+            else {
+                previous->next = current->next;
+            }
 
-      delete current;
-      return true;
+            delete current;
+            return true;
+        }
+
+        previous = current;
+        current = current->next;
     }
 
-    previous = current;
-    current = current->next;
-  }
-
-  return false;
+    return false;
 }
 
 
 // Display active reservations
 // O(n)
-void displayReservations(){
-  if(head == nullptr){
-    cout << "No active reservations.\n";
-    return;
-  }
+void displayReservations() {
+    if (head == nullptr) {
+        cout << "No active reservations.\n";
+        return;
+    }
 
-  ReservationNode* current = head;
+    ReservationNode* current = head;
 
-  cout << "----- Active Reservations -----\n";
+    cout << "----- Active Reservations -----\n";
 
-  while(current != nullptr){
-    current->data.display();
-    current = current->next;
-  }
+    while (current != nullptr) {
+        current->data.display();
+        current = current->next;
+    }
 }
 
 
 // Add reservation to waiting list
 // O(1)
-void addToWaitingList(Reservation reservation){
-  waitingList.push(reservation);
+void addToWaitingList(Reservation reservation) {
+    waitingList.push(reservation);
 
-  cout << "Reservation added to waiting list.\n";
+    cout << "Reservation added to waiting list.\n";
 }
 
 
 // Process waiting list
 // Queue operation O(1), resource search O(n)
-void processWaitingList(){
-  if(waitingList.empty()){
-    cout << "Waiting list is empty.\n";
-    return;
-  }
+void processWaitingList() {
+    if (waitingList.empty()) {
+        cout << "Waiting list is empty.\n";
+        return;
+    }
 
-  Reservation nextReservation = waitingList.front();
+    Reservation nextReservation = waitingList.front();
 
-  Resource* resource = findResource(nextReservation.resource);
+    Resource* resource = findResource(nextReservation.resource);
 
-  if(resource == nullptr){
-    cout << "Resource not found.\n";
-    return;
-  }
+    if (resource == nullptr) {
+        cout << "Resource not found.\n";
+        return;
+    }
 
-  if(!resource->isAvailable()){
-    cout << "Resource is still unavailable.\n";
-    return;
-  }
+    if (!resource->isAvailable()) {
+        cout << "Resource is still unavailable.\n";
+        return;
+    }
 
-  waitingList.pop();
+    waitingList.pop();
 
-  insertReservation(nextReservation);
+    insertReservation(nextReservation);
 
-  resource->setStatus("Unavailable");
+    resource->setStatus("Unavailable");
 
-  cout << "Reservation "
-       << nextReservation.reservationID
-       << " added to active reservations.\n";
+    cout << "Reservation "
+         << nextReservation.reservationID
+         << " added to active reservations.\n";
 }
 
 
 // Display waiting list
 // O(n)
-void displayWaitingList(){
-  if(waitingList.empty()){
-    cout << "Waiting list is empty.\n";
-    return;
-  }
+void displayWaitingList() {
+    if (waitingList.empty()) {
+        cout << "Waiting list is empty.\n";
+        return;
+    }
 
-  queue<Reservation> temp = waitingList;
+    queue<Reservation> temp = waitingList;
 
-  cout << "----- Waiting List -----\n";
+    cout << "----- Waiting List -----\n";
 
-  while(!temp.empty()){
-    Reservation r = temp.front();
+    while (!temp.empty()) {
+        Reservation r = temp.front();
 
-    cout << "Reservation ID: " << r.reservationID << endl;
-    cout << "Student: " << r.studentName << endl;
-    cout << "Resource: " << r.resource << endl;
-    cout << "Date: " << r.date << endl;
-    cout << "Time: " << r.time << endl;
+        cout << "Reservation ID: " << r.reservationID << endl;
+        cout << "Student: " << r.studentName << endl;
+        cout << "Resource: " << r.resource << endl;
+        cout << "Date: " << r.date << endl;
+        cout << "Time: " << r.time << endl;
 
-    temp.pop();
-  }
+        temp.pop();
+    }
 }
