@@ -1,6 +1,4 @@
 #include <iostream>
-#include <stack>
-#include <queue>
 #include <fstream>
 #include <sstream>
 #include <vector>
@@ -18,9 +16,11 @@ stack<Reservation> cancellationHistory;
 
 // These functions are in ComplexityTest.cpp
 void insertReservation(Reservation reservation);
+bool removeReservation(int reservationID, Reservation& removedReservation);
 void displayReservations();
 void addToWaitingList(Reservation reservation);
-bool removeReservation(int reservationID, Reservation& removedReservation);
+void displayWaitingList();
+void processWaitingList();
 
 // Load resources from resources.txt
 void loadResources(const string& filename) {
@@ -166,67 +166,83 @@ void createReservation() {
     cout << "Reservation created successfully." << endl;
 }
 
-// Note: To cancel reservations you'll need the reservation ID
+// Cancel reservation
 void cancelReservation(int reservationID) {
-  Reservation removedReservation;
-  if(removeReservation(reservationID, removedReservation)){
+    Reservation removedReservation;
 
-  cancellationHistory.push(removedReservation); //stores the cancelled reservation
-  Resource* resource = findResource(removedReservation.resource);
+    if (removeReservation(reservationID, removedReservation)) {
+        cancellationHistory.push(removedReservation);
 
-    if(resource != nullptr){
-      resource->setStatus("Available");
+        Resource* resource = findResource(removedReservation.resource);
+
+        if (resource != nullptr) {
+            resource->setStatus("Available");
+        }
+
+        cout << "Reservation "
+             << reservationID
+             << " has been cancelled successfully."
+             << endl;
+
+        return;
     }
 
-    cout << "Reservation " << reservationID << " has been cancelled successfully.\n";
-    return;
-  }
-    cout << "Reservation not found.\n"; // if reservation isnt found in active reservations
+    cout << "Reservation not found." << endl;
 }
 
+// Restore most recently cancelled reservation
 void restoreCancellation() {
-  if (cancellationHistory.empty()){
-    cout << "No cancelled reservation(s) to restore.\n";
-    return;
-  }
+    if (cancellationHistory.empty()) {
+        cout << "No cancelled reservation(s) to restore." << endl;
+        return;
+    }
 
-  Reservation restored = cancellationHistory.top(); // gets the most recent cancelled reservation
-  Resource* resource = findResource(restored.resource);
+    Reservation restored = cancellationHistory.top();
 
-  if(resource == nullptr){
-    cout << "Resource not found.\n";
-    return;
-  }
+    Resource* resource = findResource(restored.resource);
 
-  if(!resource->isAvailable()){
-    cout << "Resource is unavailable.\n";
-    return;
-  }
+    if (resource == nullptr) {
+        cout << "Resource not found." << endl;
+        return;
+    }
 
-  cancellationHistory.pop(); // removes it from cancellation history
-  insertReservation(restored); // adds it back to active reservations
+    if (!resource->isAvailable()) {
+        cout << "Resource is unavailable." << endl;
+        return;
+    }
 
-  resource->setStatus("Unavailable");
-   cout << "Reservation " << restored.reservationID << " restored successfully.\n";
+    cancellationHistory.pop();
+
+    insertReservation(restored);
+
+    resource->setStatus("Unavailable");
+
+    cout << "Reservation "
+         << restored.reservationID
+         << " restored successfully."
+         << endl;
 }
 
+// Display cancellation history
 void displayCancellationHistory() {
-  if (cancellationHistory.empty()){
-    cout << "No cancelled history.\n";
-    return;
-  }    
+    if (cancellationHistory.empty()) {
+        cout << "No cancelled history." << endl;
+        return;
+    }
 
-  stack<Reservation> temp = cancellationHistory;
-  cout << "----- Cancellation History -----\n";
+    stack<Reservation> temp = cancellationHistory;
 
-  while (!temp.empty()){
-    Reservation r = temp.top();
+    cout << "----- Cancellation History -----" << endl;
 
-    cout << "Reservation ID: " << r.reservationID << endl;
-    cout << "Student: " << r.studentName << endl;
-    cout << "Resource: " << r.resource << endl;
-    cout << "Date: " << r.date << endl;
-    cout << "Time: " << r.time << endl;
+    while (!temp.empty()) {
+        Reservation r = temp.top();
 
-    temp.pop();
-  }
+        cout << "Reservation ID: " << r.reservationID << endl;
+        cout << "Student: " << r.studentName << endl;
+        cout << "Resource: " << r.resource << endl;
+        cout << "Date: " << r.date << endl;
+        cout << "Time: " << r.time << endl;
+
+        temp.pop();
+    }
+}
