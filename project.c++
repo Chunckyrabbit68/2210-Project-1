@@ -1,4 +1,6 @@
 #include <iostream>
+#include <stack>
+#include <queue>
 #include <fstream>
 #include <sstream>
 #include <vector>
@@ -12,6 +14,7 @@
 using namespace std;
 
 vector<Resource> resources;
+stack<Reservation> cancellationHistory;
 
 // These functions are in ComplexityTest.cpp
 void insertReservation(Reservation reservation);
@@ -162,7 +165,6 @@ void createReservation() {
     cout << "Reservation created successfully." << endl;
 }
 
-// Nathan: added new code below
 // Note: To cancel reservations you'll need the reservation ID
 void cancelReservation(int reservationID) {
   Reservation removedReservation;
