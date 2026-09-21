@@ -14,6 +14,7 @@ void createReservation();
 void displayReservations();
 void displayWaitingList();
 void processWaitingList();
+bool removeFromWaitingList(int reservationID);
 
 // Cancellation functions
 void cancelReservation(int reservationID);
@@ -38,7 +39,8 @@ int main() {
         cout << "7. Cancel reservation" << endl;
         cout << "8. Restore cancelled reservation" << endl;
         cout << "9. Display cancellation history" << endl;
-        cout << "10. Exit" << endl;
+        cout << "10. Remove a request from the waiting list" << endl;
+        cout << "11. Exit" << endl;
 
         cout << "Enter choice: ";
 
@@ -46,7 +48,7 @@ int main() {
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
-            cout << "Invalid input. Please enter a number from 1 to 10." << endl;
+            cout << "Invalid input. Please enter a number from 1 to 11." << endl;
             continue;
         }
 
@@ -101,7 +103,31 @@ int main() {
                 displayCancellationHistory();
                 break;
 
-            case 10:
+            case 10: {
+                int reservationID;
+
+                cout << "Enter reservation ID to remove from the waiting list: ";
+
+                if (!(cin >> reservationID)) {
+                    cin.clear();
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+                    cout << "Invalid reservation ID." << endl;
+                    break;
+                }
+
+                if (removeFromWaitingList(reservationID)) {
+                    cout << "Reservation " << reservationID
+                         << " removed from the waiting list." << endl;
+                }
+                else {
+                    cout << "That reservation is not on the waiting list." << endl;
+                }
+
+                break;
+            }
+
+            case 11:
                 cout << "Exiting program." << endl;
                 break;
 
@@ -109,7 +135,7 @@ int main() {
                 cout << "Invalid choice. Try again." << endl;
         }
 
-    } while(choice != 10);
+    } while(choice != 11);
 
     return 0;
 }
