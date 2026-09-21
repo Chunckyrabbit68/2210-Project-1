@@ -1,17 +1,20 @@
 #include <iostream>
 #include <queue>
+#include <string>
 #include "Resource.h"
 #include "Reservation.h"
 
 using namespace std;
 
+Resource* findResource(const string& resourceID);
+
 struct ReservationNode {
-Reservation data;
-ReservationNode* next;
+  Reservation data;
+  ReservationNode* next;
 
   ReservationNode(Reservation reservation){
-  data = reservation;
-  next = nullptr;
+    data = reservation;
+    next = nullptr;
   }
 };
 
@@ -23,7 +26,7 @@ queue<Reservation> waitingList;
 // Reservation insertion
 // O(1)
 void insertReservation(Reservation reservation){
-ReservationNode* newNode = new ReservationNode(reservation);
+  ReservationNode* newNode = new ReservationNode(reservation);
 
   newNode->next = head;
   head = newNode;
@@ -33,21 +36,21 @@ ReservationNode* newNode = new ReservationNode(reservation);
 // Reservation removal
 // O(n)
 bool removeReservation(int reservationID, Reservation& removedReservation){
-ReservationNode* current = head;
-ReservationNode* previous = nullptr;
+  ReservationNode* current = head;
+  ReservationNode* previous = nullptr;
 
   while(current != nullptr){
 
     if(current->data.reservationID == reservationID){
 
-    removedReservation = current->data;
+      removedReservation = current->data;
 
-    if(previous == nullptr){
+      if(previous == nullptr){
         head = current->next;
-    }
-     else{
+      }
+      else{
         previous->next = current->next;
-       }
+      }
 
       delete current;
       return true;
@@ -65,8 +68,8 @@ ReservationNode* previous = nullptr;
 // O(n)
 void displayReservations(){
   if(head == nullptr){
-  cout << "No active reservations.\n";
-  return;
+    cout << "No active reservations.\n";
+    return;
   }
 
   ReservationNode* current = head;
@@ -74,8 +77,8 @@ void displayReservations(){
   cout << "----- Active Reservations -----\n";
 
   while(current != nullptr){
-  current->data.display();
-  current = current->next;
+    current->data.display();
+    current = current->next;
   }
 }
 
@@ -83,30 +86,32 @@ void displayReservations(){
 // Add reservation to waiting list
 // O(1)
 void addToWaitingList(Reservation reservation){
-waitingList.push(reservation);
+  waitingList.push(reservation);
 
-cout << "Reservation added to waiting list.\n";
+  cout << "Reservation added to waiting list.\n";
 }
+
 
 // Process waiting list
 // Queue operation O(1), resource search O(n)
 void processWaitingList(){
   if(waitingList.empty()){
-  cout << "Waiting list is empty.\n";
-  return;
+    cout << "Waiting list is empty.\n";
+    return;
   }
 
-Reservation nextReservation = waitingList.front();
-Resource* resource = findResource(nextReservation.resource);
+  Reservation nextReservation = waitingList.front();
+
+  Resource* resource = findResource(nextReservation.resource);
 
   if(resource == nullptr){
-  cout << "Resource not found.\n";
-  return;
+    cout << "Resource not found.\n";
+    return;
   }
 
   if(!resource->isAvailable()){
-  cout << "Resource is still unavailable.\n";
-  return;
+    cout << "Resource is still unavailable.\n";
+    return;
   }
 
   waitingList.pop();
@@ -116,16 +121,17 @@ Resource* resource = findResource(nextReservation.resource);
   resource->setStatus("Unavailable");
 
   cout << "Reservation "
-  << nextReservation.reservationID
-  << " added to active reservations.\n";
+       << nextReservation.reservationID
+       << " added to active reservations.\n";
 }
+
 
 // Display waiting list
 // O(n)
 void displayWaitingList(){
   if(waitingList.empty()){
-  cout << "Waiting list is empty.\n";
-  return;
+    cout << "Waiting list is empty.\n";
+    return;
   }
 
   queue<Reservation> temp = waitingList;
@@ -133,14 +139,14 @@ void displayWaitingList(){
   cout << "----- Waiting List -----\n";
 
   while(!temp.empty()){
-  Reservation r = temp.front();
+    Reservation r = temp.front();
 
-  cout << "Reservation ID: " << r.reservationID << endl;
-  cout << "Student: " << r.studentName << endl;
-  cout << "Resource: " << r.resource << endl;
-  cout << "Date: " << r.date << endl;
-  cout << "Time: " << r.time << endl;
+    cout << "Reservation ID: " << r.reservationID << endl;
+    cout << "Student: " << r.studentName << endl;
+    cout << "Resource: " << r.resource << endl;
+    cout << "Date: " << r.date << endl;
+    cout << "Time: " << r.time << endl;
 
-  temp.pop();
-}
+    temp.pop();
+  }
 }
