@@ -24,6 +24,24 @@ ReservationNode* head = nullptr;
 queue<Reservation> waitingList;
 
 
+// Check if reservation ID already exists
+// O(n)
+bool reservationExists(int reservationID) {
+    ReservationNode* current = head;
+
+    while (current != nullptr) {
+
+        if (current->data.reservationID == reservationID) {
+            return true;
+        }
+
+        current = current->next;
+    }
+
+    return false;
+}
+
+
 // Reservation insertion
 // O(1)
 void insertReservation(Reservation reservation) {
