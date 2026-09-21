@@ -110,18 +110,6 @@ bool removeReservation(int reservationID, Reservation& removedReservation){
 }
 
 
-// Delete all reservation nodes
-// O(n)
-void clearReservations(){
-
-  while(head != nullptr){
-    ReservationNode* temp = head;
-    head = head->next;
-    delete temp;
-  }
-}
-
-
 // Display active reservations
 // O(n)
 void displayReservations(){
@@ -158,45 +146,28 @@ void processWaitingList(){
     return;
   }
 
-  int waiting = waitingList.size();
-  bool served = false;
+  Reservation nextReservation = waitingList.front();
 
-  queue<Reservation> remaining;
+  Resource* resource = findResource(nextReservation.resource);
 
-  for(int i = 0; i < waiting; i++){
-
-    Reservation nextReservation = waitingList.front();
-    waitingList.pop();
-
-    if(served){
-      remaining.push(nextReservation);
-      continue;
-    }
-
-    Resource* resource = findResource(nextReservation.resource);
-
-    if(resource == nullptr){
-      cout << "Resource " << nextReservation.resource << " no longer exists.\n";
-      continue;
-    }
-
-    if(!resource->isAvailable() ||
-       isResourceReserved(nextReservation.resource, nextReservation.date, nextReservation.time)){
-      remaining.push(nextReservation);
-      continue;
-    }
-
-    if(insertReservation(nextReservation)){
-      cout << "Reservation " << nextReservation.reservationID << " added to active reservations.\n";
-      served = true;
-    }
+  if(resource == nullptr){
+    cout << "Resource not found.\n";
+    return;
   }
 
-  waitingList = remaining;
-
-  if(!served){
-    cout << "No waiting reservations can be activated right now.\n";
+  if(!resource->isAvailable() ||
+     isResourceReserved(nextReservation.resource, nextReservation.date, nextReservation.time)){
+    cout << "Resource is still unavailable.\n";
+    return;
   }
+
+  waitingList.pop();
+
+  insertReservation(nextReservation);
+
+  cout << "Reservation "
+       << nextReservation.reservationID
+       << " added to active reservations.\n";
 }
 
 
@@ -237,14 +208,11 @@ void displayWaitingList(){
 
   queue<Reservation> temp = waitingList;
 
-  int position = 1;
-
   cout << "----- Waiting List -----\n";
 
   while(!temp.empty()){
     Reservation r = temp.front();
 
-    cout << "Position: " << position << endl;
     cout << "Reservation ID: " << r.reservationID << endl;
     cout << "Student: " << r.studentName << endl;
     cout << "Resource: " << r.resource << endl;
@@ -252,6 +220,5 @@ void displayWaitingList(){
     cout << "Time: " << r.time << endl;
 
     temp.pop();
-    position++;
   }
 }
