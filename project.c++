@@ -1,6 +1,4 @@
 #include <iostream>
-#include <stack>
-#include <queue>
 #include <fstream>
 #include <sstream>
 #include <vector>
@@ -18,8 +16,11 @@ stack<Reservation> cancellationHistory;
 
 // These functions are in ComplexityTest.cpp
 void insertReservation(Reservation reservation);
+bool removeReservation(int reservationID, Reservation& removedReservation);
 void displayReservations();
 void addToWaitingList(Reservation reservation);
+void displayWaitingList();
+void processWaitingList();
 
 // Load resources from resources.txt
 void loadResources(const string& filename) {
@@ -151,7 +152,9 @@ void createReservation() {
 
     if (!resource->isAvailable()) {
         cout << "Resource is unavailable." << endl;
+
         addToWaitingList(newReservation);
+
         return;
     }
 
@@ -168,9 +171,11 @@ void createReservation() {
 // Note: To cancel reservations you'll need the reservation ID
 void cancelReservation(int reservationID) {
   Reservation removedReservation;
+
   if(removeReservation(reservationID, removedReservation)){
 
   cancellationHistory.push(removedReservation); //stores the cancelled reservation
+
   Resource* resource = findResource(removedReservation.resource);
 
     if(resource != nullptr){
@@ -180,7 +185,8 @@ void cancelReservation(int reservationID) {
     cout << "Reservation " << reservationID << " has been cancelled successfully.\n";
     return;
   }
-    cout << "Reservation not found.\n"; // if reservation isnt found in active reservations
+
+  cout << "Reservation not found.\n"; // if reservation isnt found in active reservations
 }
 
 void restoreCancellation() {
@@ -190,6 +196,7 @@ void restoreCancellation() {
   }
 
   Reservation restored = cancellationHistory.top(); // gets the most recent cancelled reservation
+
   Resource* resource = findResource(restored.resource);
 
   if(resource == nullptr){
@@ -203,19 +210,22 @@ void restoreCancellation() {
   }
 
   cancellationHistory.pop(); // removes it from cancellation history
+
   insertReservation(restored); // adds it back to active reservations
 
   resource->setStatus("Unavailable");
-   cout << "Reservation " << restored.reservationID << " restored successfully.\n";
+
+  cout << "Reservation " << restored.reservationID << " restored successfully.\n";
 }
 
 void displayCancellationHistory() {
   if (cancellationHistory.empty()){
     cout << "No cancelled history.\n";
     return;
-  }    // test to see if it pushes to the main
+  }
 
   stack<Reservation> temp = cancellationHistory;
+
   cout << "----- Cancellation History -----\n";
 
   while (!temp.empty()){
@@ -229,3 +239,4 @@ void displayCancellationHistory() {
 
     temp.pop();
   }
+}
