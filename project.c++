@@ -59,6 +59,11 @@ void loadResources(const string& filename) {
 void displayResources() {
     cout << "\n--- All Resources ---" << endl;
 
+    if (resources.empty()) {
+        cout << "No resources available." << endl;
+        return;
+    }
+
     for (const Resource& resource : resources) {
         resource.display();
     }
@@ -67,6 +72,11 @@ void displayResources() {
 // Display availability
 void displayAvailability() {
     cout << "\n--- Resource Availability ---" << endl;
+
+    if (resources.empty()) {
+        cout << "No resources available." << endl;
+        return;
+    }
 
     for (const Resource& resource : resources) {
         cout << resource.getResourceID()
@@ -78,9 +88,11 @@ void displayAvailability() {
     }
 }
 
-// Find resource by ID
+// Find resource by ID using linear search
 Resource* findResource(const string& resourceID) {
+
     for (Resource& resource : resources) {
+
         if (resource.getResourceID() == resourceID) {
             return &resource;
         }
@@ -89,8 +101,26 @@ Resource* findResource(const string& resourceID) {
     return nullptr;
 }
 
+// Milestone 2 - Search for a resource
+void searchResource(const string& resourceID) {
+
+    cout << "\n--- Resource Search ---" << endl;
+
+    Resource* resource = findResource(resourceID);
+
+    if (resource == nullptr) {
+        cout << "Resource not found." << endl;
+        return;
+    }
+
+    cout << "Resource found:" << endl;
+
+    resource->display();
+}
+
 // Check whether a reservation can be made
 bool validateReservation(const string& resourceID) {
+
     Resource* resource = findResource(resourceID);
 
     if (resource == nullptr) {
@@ -108,6 +138,7 @@ bool validateReservation(const string& resourceID) {
 
 // Create reservation
 void createReservation() {
+
     int reservationID;
     int studentID;
 
@@ -176,9 +207,12 @@ void createReservation() {
     );
 
     if (!resource->isAvailable()) {
+
         cout << "Resource is unavailable." << endl;
 
         addToWaitingList(newReservation);
+
+        cout << "Student added to waiting list." << endl;
 
         return;
     }
@@ -196,6 +230,7 @@ void createReservation() {
 
 // Cancel reservation
 void cancelReservation(int reservationID) {
+
     Reservation removedReservation;
 
     if (removeReservation(reservationID, removedReservation)) {
@@ -221,6 +256,7 @@ void cancelReservation(int reservationID) {
 
 // Restore most recently cancelled reservation
 void restoreCancellation() {
+
     if (cancellationHistory.empty()) {
         cout << "No cancelled reservation(s) to restore." << endl;
         return;
@@ -254,6 +290,7 @@ void restoreCancellation() {
 
 // Display cancellation history
 void displayCancellationHistory() {
+
     if (cancellationHistory.empty()) {
         cout << "No cancelled history." << endl;
         return;
@@ -261,9 +298,10 @@ void displayCancellationHistory() {
 
     stack<Reservation> temp = cancellationHistory;
 
-    cout << "----- Cancellation History -----" << endl;
+    cout << "\n----- Cancellation History -----" << endl;
 
     while (!temp.empty()) {
+
         Reservation r = temp.top();
 
         cout << "Reservation ID: " << r.reservationID << endl;
@@ -273,5 +311,101 @@ void displayCancellationHistory() {
         cout << "Time: " << r.time << endl;
 
         temp.pop();
+    }
+}
+
+// Milestone 2 - Active reservations report
+void activeReservationsReport() {
+
+    cout << "\n===== Active Reservations Report =====" << endl;
+
+    displayReservations();
+}
+
+// Milestone 2 - Resource utilization report
+// Uses the active reservation counts from ComplexityTest.cpp
+int countReservationsForResource(const string& resourceID);
+
+void resourceUtilizationReport() {
+
+    cout << "\n===== Resource Utilization Report =====" << endl;
+
+    if (resources.empty()) {
+        cout << "No resources available." << endl;
+        return;
+    }
+
+    for (const Resource& resource : resources) {
+
+        int count = countReservationsForResource(
+            resource.getResourceID()
+        );
+
+        cout << "Resource ID: "
+             << resource.getResourceID()
+             << endl;
+
+        cout << "Resource Name: "
+             << resource.getResourceName()
+             << endl;
+
+        cout << "Active Reservations: "
+             << count
+             << endl;
+
+        cout << "------------------------" << endl;
+    }
+}
+
+// Milestone 2 - Most requested resources report
+void mostRequestedResourcesReport() {
+
+    cout << "\n===== Most Requested Resources =====" << endl;
+
+    if (resources.empty()) {
+        cout << "No resources available." << endl;
+        return;
+    }
+
+    vector<int> counts(resources.size(), 0);
+
+    for (int i = 0; i < static_cast<int>(resources.size()); i++) {
+
+        counts[i] = countReservationsForResource(
+            resources[i].getResourceID()
+        );
+    }
+
+    // Find the highest active reservation count
+    int highest = 0;
+
+    for (int i = 0; i < static_cast<int>(counts.size()); i++) {
+
+        if (counts[i] > highest) {
+            highest = counts[i];
+        }
+    }
+
+    if (highest == 0) {
+        cout << "No active reservations found." << endl;
+        return;
+    }
+
+    for (int i = 0; i < static_cast<int>(resources.size()); i++) {
+
+        if (counts[i] == highest) {
+
+            cout << "Resource: "
+                 << resources[i].getResourceName()
+                 << endl;
+
+            cout << "Resource ID: "
+                 << resources[i].getResourceID()
+                 << endl;
+
+            cout << "Active Reservations: "
+                 << counts[i]
+                 << endl;
+        }
     }
 }
