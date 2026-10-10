@@ -21,7 +21,7 @@ void restoreCancellation();
 void displayCancellationHistory();
 
 // Milestone 2 searching functions
-void searchResource(int resourceID);
+void searchResource(const string& resourceID);
 void searchReservation(int reservationID);
 
 // Milestone 2 sorting function
@@ -125,17 +125,10 @@ int main() {
                 break;
 
             case 10: {
-                int resourceID;
+                string resourceID;
 
                 cout << "Enter resource ID to search: ";
-
-                if (!(cin >> resourceID)) {
-                    cin.clear();
-                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-
-                    cout << "Invalid resource ID." << endl;
-                    break;
-                }
+                cin >> resourceID;
 
                 searchResource(resourceID);
                 break;
