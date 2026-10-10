@@ -1,6 +1,7 @@
 #include <iostream>
 #include <queue>
 #include <string>
+#include <vector>
 
 #include "Resource.h"
 #include "Reservation.h"
@@ -171,4 +172,220 @@ void displayWaitingList() {
 
         temp.pop();
     }
+}
+
+
+// Milestone 2 - Search reservation by ID
+// Linear Search O(n)
+void searchReservation(int reservationID) {
+
+    ReservationNode* current = head;
+
+    while (current != nullptr) {
+
+        if (current->data.reservationID == reservationID) {
+
+            cout << "\n--- Reservation Found ---" << endl;
+            current->data.display();
+            return;
+        }
+
+        current = current->next;
+    }
+
+    cout << "Reservation not found." << endl;
+}
+
+
+// Milestone 2 - Count active reservations for a resource
+// O(n)
+int countReservationsForResource(const string& resourceID) {
+
+    int count = 0;
+
+    ReservationNode* current = head;
+
+    while (current != nullptr) {
+
+        if (current->data.resource == resourceID) {
+            count++;
+        }
+
+        current = current->next;
+    }
+
+    return count;
+}
+
+
+// Milestone 2 - Merge two sorted portions
+// O(n) for the combined portions
+void mergeReservations(
+    vector<Reservation>& reservations,
+    int left,
+    int middle,
+    int right
+) {
+
+    vector<Reservation> leftSide;
+    vector<Reservation> rightSide;
+
+    for (int i = left; i <= middle; i++) {
+        leftSide.push_back(reservations[i]);
+    }
+
+    for (int i = middle + 1; i <= right; i++) {
+        rightSide.push_back(reservations[i]);
+    }
+
+    int i = 0;
+    int j = 0;
+    int k = left;
+
+    while (i < static_cast<int>(leftSide.size()) &&
+           j < static_cast<int>(rightSide.size())) {
+
+        if (leftSide[i].date <= rightSide[j].date) {
+            reservations[k] = leftSide[i];
+            i++;
+        }
+        else {
+            reservations[k] = rightSide[j];
+            j++;
+        }
+
+        k++;
+    }
+
+    while (i < static_cast<int>(leftSide.size())) {
+        reservations[k] = leftSide[i];
+        i++;
+        k++;
+    }
+
+    while (j < static_cast<int>(rightSide.size())) {
+        reservations[k] = rightSide[j];
+        j++;
+        k++;
+    }
+}
+
+
+// Milestone 2 - Merge Sort
+// O(n log n)
+void mergeSortReservations(
+    vector<Reservation>& reservations,
+    int left,
+    int right
+) {
+
+    if (left >= right) {
+        return;
+    }
+
+    int middle = left + (right - left) / 2;
+
+    mergeSortReservations(reservations, left, middle);
+    mergeSortReservations(reservations, middle + 1, right);
+
+    mergeReservations(reservations, left, middle, right);
+}
+
+
+// Milestone 2 - Sort reservations by date
+// O(n log n)
+void sortReservationsByDate() {
+
+    if (head == nullptr) {
+        cout << "No active reservations to sort." << endl;
+        return;
+    }
+
+    vector<Reservation> reservations;
+
+    ReservationNode* current = head;
+
+    while (current != nullptr) {
+        reservations.push_back(current->data);
+        current = current->next;
+    }
+
+    mergeSortReservations(
+        reservations,
+        0,
+        static_cast<int>(reservations.size()) - 1
+    );
+
+    cout << "\n===== Reservations Sorted by Date =====" << endl;
+
+    for (const Reservation& reservation : reservations) {
+        reservation.display();
+    }
+}
+
+
+// Milestone 2 - Count students waiting for a resource
+// O(n)
+int countWaitingForResource(const string& resourceID) {
+
+    int count = 0;
+
+    queue<Reservation> temp = waitingList;
+
+    while (!temp.empty()) {
+
+        Reservation reservation = temp.front();
+
+        if (reservation.resource == resourceID) {
+            count++;
+        }
+
+        temp.pop();
+    }
+
+    return count;
+}
+
+
+// Milestone 2 - Waiting-list statistics report
+// O(r * w), where r is resources and w is waiting entries
+void waitingListStatisticsReport() {
+
+    extern vector<Resource> resources;
+
+    cout << "\n===== Waiting List Statistics =====" << endl;
+
+    if (resources.empty()) {
+        cout << "No resources available." << endl;
+        return;
+    }
+
+    int totalWaiting = 0;
+
+    for (const Resource& resource : resources) {
+
+        int count = countWaitingForResource(
+            resource.getResourceID()
+        );
+
+        cout << "Resource: "
+             << resource.getResourceName()
+             << endl;
+
+        cout << "Resource ID: "
+             << resource.getResourceID()
+             << endl;
+
+        cout << "Students Waiting: "
+             << count
+             << endl;
+
+        cout << "------------------------" << endl;
+
+        totalWaiting += count;
+    }
+
+    cout << "Total Students Waiting: "
+         << totalWaiting
+         << endl;
 }
