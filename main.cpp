@@ -20,11 +20,24 @@ void cancelReservation(int reservationID);
 void restoreCancellation();
 void displayCancellationHistory();
 
+// Milestone 2 searching functions
+void searchResource(int resourceID);
+void searchReservation(int reservationID);
+
+// Milestone 2 sorting function
+void sortReservationsByDate();
+
+// Milestone 2 reporting functions
+void activeReservationsReport();
+void resourceUtilizationReport();
+void mostRequestedResourcesReport();
+void waitingListStatisticsReport();
+
 int main() {
 
     loadResources("resources.txt");
 
-    int choice;
+    int choice = 0;
 
     do {
 
@@ -38,7 +51,17 @@ int main() {
         cout << "7. Cancel reservation" << endl;
         cout << "8. Restore cancelled reservation" << endl;
         cout << "9. Display cancellation history" << endl;
-        cout << "10. Exit" << endl;
+
+        cout << "10. Search resource by ID" << endl;
+        cout << "11. Search reservation by ID" << endl;
+        cout << "12. Sort reservations by date" << endl;
+
+        cout << "13. Active reservations report" << endl;
+        cout << "14. Resource utilization report" << endl;
+        cout << "15. Most requested resources report" << endl;
+        cout << "16. Waiting list statistics report" << endl;
+
+        cout << "17. Exit" << endl;
 
         cout << "Enter choice: ";
 
@@ -46,7 +69,7 @@ int main() {
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
-            cout << "Invalid input. Please enter a number from 1 to 10." << endl;
+            cout << "Invalid input. Please enter a number from 1 to 17." << endl;
             continue;
         }
 
@@ -101,7 +124,61 @@ int main() {
                 displayCancellationHistory();
                 break;
 
-            case 10:
+            case 10: {
+                int resourceID;
+
+                cout << "Enter resource ID to search: ";
+
+                if (!(cin >> resourceID)) {
+                    cin.clear();
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+                    cout << "Invalid resource ID." << endl;
+                    break;
+                }
+
+                searchResource(resourceID);
+                break;
+            }
+
+            case 11: {
+                int reservationID;
+
+                cout << "Enter reservation ID to search: ";
+
+                if (!(cin >> reservationID)) {
+                    cin.clear();
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+                    cout << "Invalid reservation ID." << endl;
+                    break;
+                }
+
+                searchReservation(reservationID);
+                break;
+            }
+
+            case 12:
+                sortReservationsByDate();
+                break;
+
+            case 13:
+                activeReservationsReport();
+                break;
+
+            case 14:
+                resourceUtilizationReport();
+                break;
+
+            case 15:
+                mostRequestedResourcesReport();
+                break;
+
+            case 16:
+                waitingListStatisticsReport();
+                break;
+
+            case 17:
                 cout << "Exiting program." << endl;
                 break;
 
@@ -109,7 +186,7 @@ int main() {
                 cout << "Invalid choice. Try again." << endl;
         }
 
-    } while(choice != 10);
+    } while(choice != 17);
 
     return 0;
 }
